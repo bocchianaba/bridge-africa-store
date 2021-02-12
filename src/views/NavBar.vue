@@ -74,7 +74,7 @@ export default {
             icon: 'mdi-cart',
             link: `/myproduct/${this.$store.getters.user}`
             }
-        ]
+        ] 
         return menuItems
         },
         userLogedIn(){

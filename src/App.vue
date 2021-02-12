@@ -2,7 +2,7 @@
   <v-app>
     <!-- display nav bar -->
     <nav-bar></nav-bar>
-    <router-view style="margin-top:20%"></router-view>
+    <router-view style="margin-top:15%"></router-view>
   </v-app>
 </template>
 <script>

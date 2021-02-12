@@ -3,7 +3,8 @@ import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Login from '../components/auth/Login.vue'
 import Register from '../components/auth/Register.vue'
-import Myproduct from '../components/auth/Myproduct.vue'
+import Myproduct from '../components/Myproduct.vue'
+import NotFound from '../components/NotFound.vue'
 
 Vue.use(VueRouter)
 
@@ -40,6 +41,11 @@ const routes = [
     meta: {
       requiresAuth: true
     }
+  },
+  {
+    path: '*',
+    name: 'NotFound',
+    component: NotFound
   },
   {
     path: '/about',
