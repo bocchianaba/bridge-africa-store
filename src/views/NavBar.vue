@@ -18,25 +18,24 @@
         <span class="hidden-xs-only">Bridge Africa Store</span>
         
       </div>
-      <v-toolbar-side-icon class="hidden-md-and-up" @click="drawer = !drawer"></v-toolbar-side-icon>
       <v-spacer></v-spacer>
 <!-- navigation bar links -->
       <v-toolbar-items  v-if="!userLogedIn">
-        <v-btn flat v-for="item in itemsNotlogin" :key="item.title" :to="item.link">
-          <v-icon left>{{item.icon}}</v-icon>{{item.title}}
+        <v-btn  v-for="item in itemsNotlogin" :key="item.title" :to="item.link">
+          <v-icon left>{{item.icon}}</v-icon><span>{{item.title}}</span>
         </v-btn>
         <v-spacer></v-spacer>
       </v-toolbar-items>
       <v-toolbar-items  v-else>
-        <v-btn flat v-for="item in itemslogin" :key="item.title" :to="item.link">
-          <v-icon left>{{item.icon}}</v-icon>{{item.title}}
+        <v-btn  v-for="item in itemslogin" :key="item.title" :to="item.link">
+          <v-icon left>{{item.icon}}</v-icon><span class="hidden-sm-and-down">{{item.title}}</span>
         </v-btn>
         <v-spacer></v-spacer>
       </v-toolbar-items>
       <!-- sign out button -->
       <v-toolbar-items  @click='logout' v-if="userLogedIn" >
         <v-btn
-          flat
+          
           >
           <v-icon left>mdi-account-lock</v-icon>Logout
         </v-btn>
@@ -51,7 +50,7 @@ export default {
         let menuItems =  [
             {
             title: 'Register',
-            icon: 'mdi-account-circle',
+            icon: 'mdi-account-plus-outline',
             link: '/register'
             },
             {

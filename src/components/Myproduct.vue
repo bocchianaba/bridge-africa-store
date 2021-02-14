@@ -70,10 +70,38 @@
                     sm="6"
                     md="4"
                   >
-                    <v-text-field
+                  <v-btn 
+                  color="info" 
+                  @click="onPickFile">upload image</v-btn>
+                  <input
+                   color="primary"
+                   type="file" 
+                   style="display:none" 
+                   ref="fileInput" 
+                   accept="image/*"
+                   @change="onFilePicked" />
+                  </v-col>
+                  <v-col class="img-wrap"
+                  cols="12"
+                  sm="6"
+                  md="4"
+                  >
+                    <v-img  
+                    :src="editedItem.imageUrl"
+                    max-height="125"
+                    aspect-ration="1.7"
+                    contain ></v-img>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="8"
+                    md="6"
+                  >
+                    <v-textarea
+                      outlined
                       v-model="editedItem.description"
                       label="Description"
-                    ></v-text-field>
+                    ></v-textarea>
                   </v-col>
                   <v-col
                     cols="12"
@@ -174,6 +202,7 @@
 
 <script>
 import {db} from "../main.js"
+import firebase from "firebase"
   export default {
     data: () => ({
       date: null,
@@ -198,6 +227,8 @@ import {db} from "../main.js"
       editedItem: {
         label: '',
         price: '',
+        imageUrl: [],
+        image: null,
         description: '',
         available: '',
         date: ''
@@ -205,6 +236,8 @@ import {db} from "../main.js"
       defaultItem: {
         label: '',
         price: '',
+        image: null,
+        imageUrl: [],
         description: '',
         available: '',
         date: ''
@@ -237,6 +270,7 @@ import {db} from "../main.js"
                         key: doc.id,
                         available: doc.data().available,
                         date: doc.data().date,
+                        imageUrl: doc.data().imageUrl,
                         description: doc.data().description,
                         label: doc.data().label,
                         price: doc.data().price,
@@ -251,6 +285,22 @@ import {db} from "../main.js"
             })
     },
     methods:{
+      onPickFile(){
+        this.$refs.fileInput.click()
+      },
+      onFilePicked(event){
+        const files=event.target.files
+        let filename = files[0].name
+        if(filename.lastIndexOf('.') <=0){
+          return alert('Please add a valid file')
+        }
+        const fileReader= new FileReader()
+        fileReader.addEventListener('load', ()=>{
+          this.editedItem.imageUrl =fileReader.result
+        })
+        fileReader.readAsDataURL(files[0])
+        this.editedItem.image=files[0]
+      },
       editItem (item) {
         this.editedIndex = this.products.indexOf(item)
         this.editedkey = this.products[this.editedIndex].key
@@ -298,17 +348,25 @@ import {db} from "../main.js"
       save () {
         if (this.editedIndex > -1) {
           Object.assign(this.products[this.editedIndex], this.editedItem)
+          let imageUrl
+          let key=this.editedkey
           //update product
           db.collection("products")
           .doc(this.editedkey)
           .update({
             available: this.editedItem.available,
             date: this.editedItem.date,
+            imageUrl: this.editedItem.imageUrl,
             description: this.editedItem.description,
             label: this.editedItem.label,
             price: this.editedItem.price
           })
-          .then(() => {
+          .then(()=>{
+            const filename=this.editedItem.image.name
+            const ext=filename.slice(filename.lastIndexOf('.'))
+            firebase.storage().ref('products/'+key+ext).put(this.editedItem.image)
+            imageUrl =firebase.storage().ref('products/'+key+ext).getDownloadURL()
+            firebase.firestore().collection('products').doc(key).update({imageUrl: imageUrl})
             console.log("product successfully updated!");
           })
           .catch((error) => {
@@ -316,16 +374,26 @@ import {db} from "../main.js"
           });
         } else {
           //createProduct
+          let key
+          let imageUrl
           db.collection("products")
           .add({ 
             date: this.editedItem.date,
             label: this.editedItem.label,
             description: this.editedItem.description,
+            imageUrl:this.editedItem.imageUrl,
             price: this.editedItem.price,
             userId: this.$store.getters.user,
             available: this.editedItem.available
             })
-          .then(() => {
+          .then((doc) => {
+            key=doc.id
+            const filename=this.editedItem.editedItem.image.name
+            const ext=filename.slice(filename.lastIndexOf('.'))
+            firebase.storage().ref('products/'+key+ext).put(this.editedItem.image)
+            imageUrl =firebase.storage().ref('products/'+key+ext).getDownloadURL()
+            firebase.firestore().collection('products').doc(key).update({imageUrl: imageUrl})
+            console.log("product successfully updated!");
             console.log("Collection successfully written!");
           })
           .catch((error) => {
@@ -354,7 +422,7 @@ import {db} from "../main.js"
           .catch((error) => {
             console.error("Error writing collection: ", error);
           })
-    }
-    }
+        }
+      }
     }
 </script>

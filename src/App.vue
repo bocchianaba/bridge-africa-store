@@ -1,8 +1,8 @@
 <template>
   <v-app>
     <!-- display nav bar -->
-    <nav-bar></nav-bar>
-    <router-view style="margin-top:15%"></router-view>
+      <nav-bar></nav-bar>
+      <router-view style="margin-top:65px"></router-view>
   </v-app>
 </template>
 <script>

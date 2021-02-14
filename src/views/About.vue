@@ -1,61 +1,41 @@
 <template>
-    <v-container fluid fill-height class="home-hero" style="max-height: 100vh;">
-        <v-layout row wrap>
-          <v-flex  class="text-lg-center" mt-5>
-            <h1>Your products List</h1>
-          </v-flex>
-          <v-btn flat color="primary">
-            <v-icon left>mdi-plus</v-icon>
-            Ajouter un produits</v-btn>
-            <v-data-table
-                :headers="headers"
-                :items="products"
-                :items-per-page="5"
-                class="elevation-1"
-            ></v-data-table>
-        </v-layout>      
-    </v-container>
+  <v-app>
+    <v-form v-model="valid"  @submit.prevent="userLogin">
+      <v-card width="400" class="mx-auto mt-5">
+        <v-card-title class="pb-0">
+          <h1 style="text-align:center">Login</h1>
+        </v-card-title>
+        <v-card-text style="margin-top:40px">
+            <v-text-field 
+              name="email"
+              label="Email"
+              id="email"
+              type="email"
+              v-model="user.email"
+              :rules="emailRules"
+              required
+              prepend-icon="mdi-account-circle"
+            />
+            <v-text-field 
+              name="password"
+              label="Password"
+              id="password"
+              v-model="user.password"
+              :rules="passwordRules"
+              required
+              :type="showPassword ? 'text' : 'password'" 
+              prepend-icon="mdi-lock"
+              :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+              @click:append="showPassword = !showPassword"
+            />
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-btn color="success" to="/register">Register</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn :disabled="!valid" type="submit"  color="info">Login</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-form>
+  </v-app>
 </template>
-
-<script>
-import {db} from "../main.js"
-  export default {
-    data () {
-      return {
-        products: [],
-        headers: [
-          {
-            text: 'Label',
-            align: 'start',
-            value: 'label',
-          },
-          { text: 'Price(FCFA)', value: 'price' },
-          { text: 'Description', value: 'description' },
-          { text: 'Available', value: 'available' },
-          { text: 'Date', value: 'date' }
-        ]
-      }
-    },
-   created() {
-            db.collection('products').where("userId","==",this.$store.getters.user).onSnapshot((snapshotChange) => {
-                this.products = [];
-                snapshotChange.forEach((doc) => {
-                    this.products.push({
-                        key: doc.id,
-                        available: doc.data().available,
-                        date: doc.data().date.toDate(),
-                        description: doc.data().description,
-                        label: doc.data().label,
-                        price: doc.data().price,
-                        userId: doc.data().userId
-                    });
-                    console.log(doc.id,"=>",doc.data())
-                });
-                return this.products
-            })
-            .catch((error)=>{
-              console.log(error.message)
-            })
-        }
-  }
-</script>
