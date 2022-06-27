@@ -47,37 +47,37 @@ export default {
     title:process.env.VUE_APP_TITLE,
     computed: {
         itemsNotlogin() {
-        let menuItems =  [
+          let menuItems =  [
             {
-            title: 'Register',
-            icon: 'mdi-account-plus-outline',
-            link: '/register'
+              title: 'Register',
+              icon: 'mdi-account-plus-outline',
+              link: '/register'
             },
             {
-            title: 'Login',
-            icon: 'mdi-account-key',
-            link: '/login'
+              title: 'Login',
+              icon: 'mdi-account-key',
+              link: '/login'
             }
-        ]
-        return menuItems
+          ]
+          return menuItems
         },
         itemslogin() {
-        let menuItems =  [
+          let menuItems =  [
             {
-            title: 'Home',
-            icon: 'mdi-home',
-            link: '/home'
+              title: 'Home',
+              icon: 'mdi-home',
+              link: '/home'
             },
             {
-            title: 'My Products',
-            icon: 'mdi-cart',
-            link: `/myproduct/${this.$store.getters.user}`
+              title: 'My Products',
+              icon: 'mdi-cart',
+              link: `/myproduct/${this.$store.getters.user}`
             }
-        ] 
-        return menuItems
+          ] 
+          return menuItems
         },
         userLogedIn(){
-            return this.$store.getters.user
+          return this.$store.getters.user
         }
     },
     methods:{

@@ -80,33 +80,34 @@
   </v-container>
 </template>
 <script>
-  import {db} from "../main"
+  // import {db} from "../main"
   export default {
     data: () => ({
       show: false,
       products: [],
     }),
     created () {
-      db.collection('products').onSnapshot((snapshotChange) => {
-                this.products = [];
-                snapshotChange.forEach((doc) => {
-                    this.products.push({
-                        key: doc.id,
-                        available: doc.data().available,
-                        date: doc.data().date,
-                        imageUrl: doc.data().imageUrl,
-                        description: doc.data().description,
-                        label: doc.data().label,
-                        price: doc.data().price,
-                        userId: doc.data().userId
-                    });
-                    console.log(doc.id,"=>",doc.data())
-                });
-                return this.products
-            })
-            .catch((error)=>{
-              console.log(error.message)
-            })
+      // db.collection('products').onSnapshot((snapshotChange) => {
+      //           this.products = [];
+      //           snapshotChange.forEach((doc) => {
+      //               this.products.push({
+      //                   key: doc.id,
+      //                   available: doc.data().available,
+      //                   date: doc.data().date,
+      //                   imageUrl: doc.data().imageUrl,
+      //                   description: doc.data().description,
+      //                   label: doc.data().label,
+      //                   price: doc.data().price,
+      //                   userId: doc.data().userId
+      //               });
+      //               console.log(doc.id,"=>",doc.data())
+      //           });
+      //           return this.products
+      //       })
+      //       .catch((error)=>{
+      //         console.log(error.message)
+      //       })
+      //get all products from the store 
     },
   }
 </script>

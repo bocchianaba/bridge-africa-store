@@ -201,8 +201,8 @@
 
 
 <script>
-import {db} from "../main.js"
-import firebase from "firebase"
+// import {db} from "../main.js"
+// import firebase from "firebase"
   export default {
     data: () => ({
       date: null,
@@ -263,26 +263,26 @@ import firebase from "firebase"
     },
 
     created () {
-      db.collection('products').where("userId","==",this.$store.getters.user).onSnapshot((snapshotChange) => {
-                this.products = [];
-                snapshotChange.forEach((doc) => {
-                    this.products.push({
-                        key: doc.id,
-                        available: doc.data().available,
-                        date: doc.data().date,
-                        imageUrl: doc.data().imageUrl,
-                        description: doc.data().description,
-                        label: doc.data().label,
-                        price: doc.data().price,
-                        userId: doc.data().userId
-                    });
-                    console.log(doc.id,"=>",doc.data())
-                });
-                return this.products
-            })
-            .catch((error)=>{
-              console.log(error.message)
-            })
+      // db.collection('products').where("userId","==",this.$store.getters.user).onSnapshot((snapshotChange) => {
+      //           this.products = [];
+      //           snapshotChange.forEach((doc) => {
+      //               this.products.push({
+      //                   key: doc.id,
+      //                   available: doc.data().available,
+      //                   date: doc.data().date,
+      //                   imageUrl: doc.data().imageUrl,
+      //                   description: doc.data().description,
+      //                   label: doc.data().label,
+      //                   price: doc.data().price,
+      //                   userId: doc.data().userId
+      //               });
+      //               console.log(doc.id,"=>",doc.data())
+      //           });
+      //           return this.products
+      //       })
+      //       .catch((error)=>{
+      //         console.log(error.message)
+      //       })
     },
     methods:{
       onPickFile(){
@@ -318,15 +318,17 @@ import firebase from "firebase"
       deleteItemConfirm () {
         this.products.splice(this.editedIndex, 1)
         this.closeDelete()
-        db.collection("products")
-        .doc(this.editedkey)
-        .delete()
-        .then(() => {
-          console.log("Document successfully deleted!");
-        })
-        .catch((error) => {
-          console.error("Error removing document: ", error);
-        });
+        // db.collection("products")
+        // .doc(this.editedkey)
+        // .delete()
+        // .then(() => {
+        //   console.log("Document successfully deleted!");
+        // })
+        // .catch((error) => {
+        //   console.error("Error removing document: ", error);
+        // });
+
+        //action to delete item from backend
       },
 
       close () {
@@ -348,81 +350,85 @@ import firebase from "firebase"
       save () {
         if (this.editedIndex > -1) {
           Object.assign(this.products[this.editedIndex], this.editedItem)
-          let imageUrl
-          let key=this.editedkey
+          // let imageUrl
+          // let key=this.editedkey
           //update product
-          db.collection("products")
-          .doc(this.editedkey)
-          .update({
-            available: this.editedItem.available,
-            date: this.editedItem.date,
-            imageUrl: this.editedItem.imageUrl,
-            description: this.editedItem.description,
-            label: this.editedItem.label,
-            price: this.editedItem.price
-          })
-          .then(()=>{
-            const filename=this.editedItem.image.name
-            const ext=filename.slice(filename.lastIndexOf('.'))
-            firebase.storage().ref('products/'+key+ext).put(this.editedItem.image)
-            imageUrl =firebase.storage().ref('products/'+key+ext).getDownloadURL()
-            firebase.firestore().collection('products').doc(key).update({imageUrl: imageUrl})
-            console.log("product successfully updated!");
-          })
-          .catch((error) => {
-            console.error("Error updating product: ", error);
-          });
+          // db.collection("products")
+          // .doc(this.editedkey)
+          // .update({
+          //   available: this.editedItem.available,
+          //   date: this.editedItem.date,
+          //   imageUrl: this.editedItem.imageUrl,
+          //   description: this.editedItem.description,
+          //   label: this.editedItem.label,
+          //   price: this.editedItem.price
+          // })
+          // .then(()=>{
+          //   const filename=this.editedItem.image.name
+          //   const ext=filename.slice(filename.lastIndexOf('.'))
+          //   firebase.storage().ref('products/'+key+ext).put(this.editedItem.image)
+          //   imageUrl =firebase.storage().ref('products/'+key+ext).getDownloadURL()
+          //   firebase.firestore().collection('products').doc(key).update({imageUrl: imageUrl})
+          //   console.log("product successfully updated!");
+          // })
+          // .catch((error) => {
+          //   console.error("Error updating product: ", error);
+          // });
         } else {
           //createProduct
-          let key
-          let imageUrl
-          db.collection("products")
-          .add({ 
-            date: this.editedItem.date,
-            label: this.editedItem.label,
-            description: this.editedItem.description,
-            imageUrl:this.editedItem.imageUrl,
-            price: this.editedItem.price,
-            userId: this.$store.getters.user,
-            available: this.editedItem.available
-            })
-          .then((doc) => {
-            key=doc.id
-            const filename=this.editedItem.editedItem.image.name
-            const ext=filename.slice(filename.lastIndexOf('.'))
-            firebase.storage().ref('products/'+key+ext).put(this.editedItem.image)
-            imageUrl =firebase.storage().ref('products/'+key+ext).getDownloadURL()
-            firebase.firestore().collection('products').doc(key).update({imageUrl: imageUrl})
-            console.log("product successfully updated!");
-            console.log("Collection successfully written!");
-          })
-          .catch((error) => {
-            console.error("Error writing collection: ", error);
-          })
+          // let key
+          // let imageUrl
+          // db.collection("products")
+          // .add({ 
+          //   date: this.editedItem.date,
+          //   label: this.editedItem.label,
+          //   description: this.editedItem.description,
+          //   imageUrl:this.editedItem.imageUrl,
+          //   price: this.editedItem.price,
+          //   userId: this.$store.getters.user,
+          //   available: this.editedItem.available
+          //   })
+          // .then((doc) => {
+          //   key=doc.id
+          //   const filename=this.editedItem.editedItem.image.name
+          //   const ext=filename.slice(filename.lastIndexOf('.'))
+          //   firebase.storage().ref('products/'+key+ext).put(this.editedItem.image)
+          //   imageUrl =firebase.storage().ref('products/'+key+ext).getDownloadURL()
+          //   firebase.firestore().collection('products').doc(key).update({imageUrl: imageUrl})
+          //   console.log("product successfully updated!");
+          //   console.log("Collection successfully written!");
+          // })
+          // .catch((error) => {
+          //   console.error("Error writing collection: ", error);
+          // })
           this.products.push(this.editedItem)
         }
         this.close()
       },
+
       saveDate (date) {
         this.$refs.menu.save(date)
       },
-      createProduct(label, price, description, available, date) {
-        db.collection("products")
-          .add({ 
-            date: date,
-            label: label,
-            description: description,
-            price: price,
-            userId: this.$store.getters.user,
-            available: available
-            })
-          .then(() => {
-            console.log("Collection successfully written!");
-          })
-          .catch((error) => {
-            console.error("Error writing collection: ", error);
-          })
-        }
+
+      // createProduct(label, price, description, available, date) {
+      //   // db.collection("products")
+      //   //   .add({ 
+      //   //     date: date,
+      //   //     label: label,
+      //   //     description: description,
+      //   //     price: price,
+      //   //     userId: this.$store.getters.user,
+      //   //     available: available
+      //   //     })
+      //   //   .then(() => {
+      //   //     console.log("Collection successfully written!");
+      //   //   })
+      //   //   .catch((error) => {
+      //   //     console.error("Error writing collection: ", error);
+      //   //   })
+
+      //   // create a product action
+      // }
       }
     }
 </script>

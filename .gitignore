@@ -21,3 +21,10 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+server/venv/
+server/backend/backend/__pycache__/
+server/backend/api/__pycache__/
+server/backend/api/migrations/
+server/backend/api/views/__pycache__/
+server/backend/api/serializers/__pycache__/
+
