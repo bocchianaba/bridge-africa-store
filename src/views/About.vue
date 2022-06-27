@@ -1,9 +1,9 @@
 <template>
   <v-app>
-    <v-form v-model="valid"  @submit.prevent="userLogin">
+    <v-form v-model="valid"  @submit.prevent="userRegistration">
       <v-card width="400" class="mx-auto mt-5">
         <v-card-title class="pb-0">
-          <h1 style="text-align:center">Login</h1>
+          <h1 style="text-align:center">Register</h1>
         </v-card-title>
         <v-card-text style="margin-top:40px">
             <v-text-field 
@@ -28,12 +28,21 @@
               :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               @click:append="showPassword = !showPassword"
             />
+            <v-text-field
+                name="confirmPassword"
+                label="Confirm Password"
+                id="confirmPassword"
+                type="password"
+                v-model="confirmPassword"
+                :rules="confirmPasswordRules.concat(passwordConfirmationRule)"
+                required
+                ></v-text-field>
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
-          <v-btn color="success" to="/register">Register</v-btn>
+          <v-btn color="info" to="/login">Login</v-btn>
           <v-spacer></v-spacer>
-          <v-btn :disabled="!valid" type="submit"  color="info">Login</v-btn>
+          <v-btn :disabled="!valid" type="submit"  color="success">Register</v-btn>
         </v-card-actions>
       </v-card>
     </v-form>
