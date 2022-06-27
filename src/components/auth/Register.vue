@@ -7,12 +7,12 @@
         </v-card-title>
         <v-card-text style="margin-top:40px">
             <v-text-field 
-              name="email"
+              name="username"
               label="Email"
-              id="email"
-              type="email"
-              v-model="user.email"
-              :rules="emailRules"
+              id="username"
+              type="username"
+              v-model="user.username"
+              :rules="usernameRules"
               required
               prepend-icon="mdi-account-circle"
             />
@@ -58,7 +58,7 @@ export default {
     return {
       showPassword:false,
       valid: false,
-      emailRules: [
+      usernameRules: [
         v => !!v || 'E-mail is required',
         v => /.+@.+/.test(v) || 'E-mail must be valid',
       ],
@@ -69,7 +69,7 @@ export default {
       confirmPassword:"",
       user: {
         name: '',
-        email: '',
+        username: '',
         password: ''
       }
     };

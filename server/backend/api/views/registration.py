@@ -40,16 +40,5 @@ class UserLoginView(APIView):
 
         if valid:
             status_code = status.HTTP_200_OK
-
-            response = {
-                'success': True,
-                'statusCode': status_code,
-                'message': 'User logged in successfully',
-                'access': serializer.data['access'],
-                'refresh': serializer.data['refresh'],
-                'authenticatedUser': {
-                    'username': serializer.data['username'],
-                }
-            }
-
-            return Response(response, status=status_code)
+            
+            return Response(serializer.data, status=status_code)

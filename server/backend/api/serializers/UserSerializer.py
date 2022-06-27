@@ -27,6 +27,7 @@ class UserLoginSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=128, write_only=True)
     access = serializers.CharField(read_only=True)
     refresh = serializers.CharField(read_only=True)
+    id = serializers.IntegerField(read_only=True)
 
     def create(self, validated_date):
         pass
@@ -48,11 +49,12 @@ class UserLoginSerializer(serializers.Serializer):
             access_token = str(refresh.access_token)
 
             update_last_login(None, user)
-
+            print(user.id)
             validation = {
                 'access': access_token,
                 'refresh': refresh_token,
                 'username': user.username,
+                'id': user.id,
             }
 
             return validation
