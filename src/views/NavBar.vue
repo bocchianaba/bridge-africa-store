@@ -71,7 +71,7 @@ export default {
             {
               title: 'My Products',
               icon: 'mdi-cart',
-              link: `/myproduct/${this.$store.getters.user}`
+              link: `/myproduct`
             }
           ] 
           return menuItems
@@ -85,6 +85,9 @@ export default {
             this.$store.dispatch('logoutAction')
             this.$router.push('/login')
         }
-    }
+    },
+    created () {
+      this.$store.dispatch('initAction')
+    },
 }
 </script>

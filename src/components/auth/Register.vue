@@ -38,12 +38,23 @@
                 :rules="confirmPasswordRules.concat(passwordConfirmationRule)"
                 required
                 ></v-text-field>
+                <v-checkbox
+                  v-model="user.rememberMe"
+                  label="Remember Me ?"
+                ></v-checkbox>
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
-          <v-btn color="info" to="/login"><v-icon>mdi-shield-account</v-icon>Login</v-btn>
+          <v-btn color="info" @click="login">
+          <v-icon>mdi-shield-account</v-icon>Login</v-btn>
           <v-spacer></v-spacer>
-          <v-btn :disabled="!valid" type="submit"  color="success"><v-icon>mdi-account-plus</v-icon>Register</v-btn>
+          <v-btn :disabled="!valid" type="submit"  color="success">
+          <v-progress-circular
+            indeterminate
+            color="white"
+            v-if="$store.state.status=='loading'"
+          ></v-progress-circular>
+          <v-icon v-else>mdi-account-plus</v-icon>Register</v-btn>
         </v-card-actions>
       </v-card>
     </v-form>
@@ -70,14 +81,18 @@ export default {
       user: {
         name: '',
         username: '',
-        password: ''
+        password: '',
+        rememberMe: true,
       }
     };
   },
   methods: {
-    userRegistration() {
-      this.$store.dispatch('registerAction',this.user)
-      this.$router.push('/login')
+   async userRegistration() {
+      await this.$store.dispatch('registerAction',this.user)
+      this.$router.push((this.$router.history.current.query.from) ? {path:'login', query:{ from: this.$router.history.current.query.from} }: '/login')      
+    },
+    login() {
+      this.$router.push((this.$router.history.current.query.from) ? {path:'login', query:{ from: this.$router.history.current.query.from} }: '/login')
     }
   },
   computed: {

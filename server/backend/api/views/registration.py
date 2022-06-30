@@ -5,7 +5,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from ..serializers.UserSerializer import (
     UserRegistrationSerializer,
-    UserLoginSerializer
+    UserLoginSerializer,
+    UserListSerializer
 )
 
 
@@ -24,8 +25,7 @@ class UserRegistrationView(APIView):
             response = {
                 'success': True,
                 'statusCode': status_code,
-                'message': 'User successfully registered!',
-                'user': serializer.data
+                'message': 'User successfully registered!'
             }
 
             return Response(response, status=status_code)
@@ -42,3 +42,11 @@ class UserLoginView(APIView):
             status_code = status.HTTP_200_OK
             
             return Response(serializer.data, status=status_code)
+
+class UserDetailView(APIView):
+    serializer_class=UserListSerializer
+    permission_classes=(IsAuthenticated,)
+
+    def get(self, request):
+        serializer = self.serializer_class(request.user)
+        return Response(serializer.data)

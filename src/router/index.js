@@ -12,32 +12,40 @@ const routes = [
   {
     path: '/register',
     name: 'Register',
-    component: Register
+    component: Register,
+    beforeEnter: (to, from, next) => {
+      if (window.localStorage.getItem('token_access_api_bas')) {
+        next('/home')
+      } else {
+        next()
+      }
+    }
   },
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
+    beforeEnter: (to, from, next) => {
+      if (window.localStorage.getItem('token_access_api_bas')) {
+        next('/home')
+      } else {
+        next()
+      }
+    }
   },
   {
     path: '/',
-    redirect: '/login',
-    meta:{
-      hideForAuth: true
-    }
+    redirect: '/home',
   },
   {
-    path: '/myproduct/:id',
+    path: '/myproduct',
     name: 'Myproduct',
     component: Myproduct,
-    meta: {
-      requiresAuth: true
-    }
   },
   {
     path: '/home',
     name: 'Home',
-    component: Home
+    component: Home,
   },
   {
     path: '*',
@@ -60,31 +68,15 @@ const router = new VueRouter({
   routes
 })
 
-import firebase from "firebase"
 
 router.beforeEach((to, from, next) => {
-  firebase.auth().onAuthStateChanged(function(user) {
-      if (to.matched.some(record => record.meta.requiresAuth)) {
-          if (!user) {
-              next({ path: '/login' });
-          } else {
-              next();
-          }
 
-      } else {
-          next();
-      }
+  const token = window.localStorage.getItem('token_access_api_bas')
+  const loginpath = window.location.pathname
 
-      if (to.matched.some(record => record.meta.hideForAuth)) {
-          if (user) {
-              next({ path: '/dashboard' });
-          } else {
-              next();
-          }
-      } else {
-          next();
-      }
-  });
+  if(!token && to.path!='/login' && to.path!='/register') next({ name: 'Login', query: { from: loginpath } })
+  else next()
+
 });
 
 export default router
