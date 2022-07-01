@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from ..serializers.ProductSerializer import ProductSerializer, ProductNestedSerializer
+from ..serializers.ProductSerializer import ProductSerializer
 from ..models import Product
 from rest_framework import status
 from rest_framework.views import APIView
@@ -8,10 +8,10 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 class ProductDetailView(APIView):
     serializer_class = ProductSerializer
-    permission_classes = (AllowAny, )
+    permission_classes = (IsAuthenticated, )
 
     def get(self, request, *args, **kwargs):
-        product = Product.objects.filter(id=kwargs['pk'])
+        product = Product.objects.all()
         serializer = ProductSerializer(product, context={"request": request}, many=True)
         response = serializer.data
         return Response(response, status=status.HTTP_200_OK)

@@ -15,29 +15,28 @@
           transition="scale-transition"
           width="40"
         />
-        <span class="hidden-xs-only">Bridge Africa Store</span>
+        <span class="hidden-xs-only">{{title}}</span>
         
       </div>
       <v-spacer></v-spacer>
 <!-- navigation bar links -->
       <v-toolbar-items  v-if="!userLogedIn">
-        <v-btn  v-for="item in itemsNotlogin" :key="item.title" :to="item.link">
+        <v-btn color="green darken-3"  v-for="item in itemsNotlogin" :key="item.title" :to="item.link">
           <v-icon left>{{item.icon}}</v-icon><span>{{item.title}}</span>
         </v-btn>
         <v-spacer></v-spacer>
       </v-toolbar-items>
       <v-toolbar-items  v-else>
-        <v-btn  v-for="item in itemslogin" :key="item.title" :to="item.link">
+        <v-btn color="green darken-3"  v-for="item in itemslogin" :key="item.title" :to="item.link">
           <v-icon left>{{item.icon}}</v-icon><span class="hidden-sm-and-down">{{item.title}}</span>
         </v-btn>
         <v-spacer></v-spacer>
       </v-toolbar-items>
       <!-- sign out button -->
       <v-toolbar-items  @click='logout' v-if="userLogedIn" >
-        <v-btn
-          
+        <v-btn  color="green darken-3"        
           >
-          <v-icon left>mdi-account-lock</v-icon>Logout
+          <v-icon left>mdi-account-lock</v-icon><span class="hidden-sm-and-down">Logout</span>
         </v-btn>
       </v-toolbar-items>
     </v-app-bar>
@@ -45,6 +44,9 @@
 <script>
 export default {
     title:process.env.VUE_APP_TITLE,
+    data(){
+      return {title:process.env.VUE_APP_TITLE}
+    },
     computed: {
         itemsNotlogin() {
           let menuItems =  [
@@ -69,8 +71,8 @@ export default {
               link: '/home'
             },
             {
-              title: 'My Products',
-              icon: 'mdi-cart',
+              title: 'My Cars',
+              icon: 'mdi-car',
               link: `/myproduct`
             }
           ] 

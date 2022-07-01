@@ -5,7 +5,7 @@
       cols="12"
       lg="12"
       md="12">
-        <h2 style="text-align:center">Welcome to your best online sales application</h2>
+        <h2 style="text-align:center">Welcome to your best online sales application destinated for car</h2>
       </v-col> 
        <v-col 
         cols="12"
@@ -22,19 +22,32 @@
       cols="12"
       lg="12"
       md="12">
-        <h2 style="text-align:center;color: blue">Bridge Africa Store</h2>
+        <h2 style="text-align:center;color: blue">{{title}}</h2>
       </v-col>
-    </v-row>     
-    <v-row>
+    </v-row> 
+    <v-row
+      v-if="products.length">
+      <v-col>
+          <div class="text-center">
+              <v-pagination
+              :value="page"
+              @input="update_page"
+              :length="Math.ceil(products.length/perPage)"
+              circle
+              ></v-pagination>
+          </div>
+      </v-col>
+    </v-row>    
+    <v-row justify="center">
       <v-col 
         cols="12"
         md="4"
         sm="6"
         xs="8"
-        v-for="item in products" :key="item.key" :to="item.link">
+        v-for="item in visibleProducts" :key="item.id">
         <v-card>
           <v-img
-            :src="item.imageUrl"
+            :src="item.image"
             height="200px"
             contain
           ></v-img>
@@ -51,22 +64,82 @@
             <v-btn
               color="orange lighten-2"
               text
+              :to="item.link"
             >
-              pourchase
+              Pourchase
             </v-btn>
+
+            <v-spacer></v-spacer>
+            <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+            <v-badge
+              color="primary"
+              :content="item.like.length"
+              v-bind="attrs"
+              v-on="on"
+            >                               
+              <v-btn
+                color="primary"
+                icon
+                :to="item.link"
+              >
+                <v-icon>{{(item.like.findIndex(l=>user.id==l)!=-1)?'mdi-thumb-up':'mdi-thumb-up-outline'}}</v-icon>
+              </v-btn>
+            </v-badge>
+            </template>
+            <span>Aimer</span>
+            </v-tooltip>
+
+            <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+            <v-badge
+              color="primary"
+              :content="item.dislike.length"
+              v-bind="attrs"
+              v-on="on"
+            > 
+            <v-btn
+              color="primary"
+              icon
+            >
+              <v-icon>{{(item.dislike.findIndex(l=>user.id==l)!=-1)?'mdi-thumb-down':'mdi-thumb-down-outline'}}</v-icon>
+            </v-btn>
+            </v-badge>
+            </template>
+            <span>Ne pas aimer</span>
+            </v-tooltip>
+
+            <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+            <v-badge
+              color="primary"
+              :content="item.love.length"
+              v-bind="attrs"
+              v-on="on"
+            > 
+            <v-btn
+              color="primary"
+              icon
+            >
+              <v-icon>{{(item.love.findIndex(l=>user.id==l)!=-1)?'mdi-heart':'mdi-heart-outline'}}</v-icon>
+            </v-btn>
+            </v-badge>
+            </template>
+            <span>Adorer</span>
+            </v-tooltip>
 
             <v-spacer></v-spacer>
 
             <v-btn
               icon
-              @click="show = !show"
+              @click="item.show = !item.show"
             >
-              <v-icon>{{ show ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+              <v-icon>{{ item.show ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
             </v-btn>
           </v-card-actions>
 
           <v-expand-transition>
-            <div v-show="show">
+            <div v-show="item.show">
               <v-divider></v-divider>
 
               <v-card-text>
@@ -81,10 +154,30 @@
 </template>
 <script>
 
+import { mapGetters } from 'vuex'
+
+
   export default {
     data: () => ({
       show: false,
-      products: [],
+      title: process.env.VUE_APP_TITLE
     }),
+    async created(){
+      await this.$store.dispatch('productsAction')
+    },
+    computed:{
+      ...mapGetters([
+        'visibleProducts',
+        'user',
+        'products',
+        'page',
+        'perPage'
+      ])
+    },
+    methods:{
+      update_page(number) {
+        this.$store.commit("SET_PAGE", number);
+      },
+    }
   }
 </script>
