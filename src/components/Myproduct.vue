@@ -1,8 +1,8 @@
 <template>
   <v-data-table
     :headers="headers"
-    :items="products"
-    sort-by="date"
+    :items="myproducts"
+    sort-by="date_updated"
     class="elevation-1"
   ><template v-slot:item.available="{ item }">
         <v-simple-checkbox
@@ -14,12 +14,20 @@
       <v-toolbar
         flat
       >
-        <v-toolbar-title><span>Your List of Products</span></v-toolbar-title>
+        <v-toolbar-title><span>Your List of Cars</span></v-toolbar-title>
         <v-divider
           class="mx-4"
           inset
           vertical
         ></v-divider>
+        <v-spacer></v-spacer>
+        <v-text-field
+        v-model="search"
+        append-icon="mdi-magnify"
+        label="Search"
+        single-line
+        hide-details
+      ></v-text-field>
         <v-spacer></v-spacer>
         <v-dialog
           v-model="dialog"
@@ -34,7 +42,7 @@
               v-on="on"
             >
             <v-icon>mdi-plus</v-icon>
-              <span class="hidden-sm-and-down">NEW PRODUCT</span>
+              <span class="hidden-sm-and-down">NEW CAR</span>
             </v-btn>
           </template>
           <v-card>
@@ -44,7 +52,7 @@
 
             <v-card-text>
               <v-container>
-                <v-row>
+                <v-row justify="center">
                   <v-col
                     cols="12"
                     sm="6"
@@ -53,26 +61,33 @@
                     <v-text-field
                       v-model="editedItem.label"
                       label="Label"
+                      :rules="[value => !!value || 'Required.',v => (v && v.length <= 10) || 'Name must be less than 10 characters']"
+                      hide-details="auto"
                     ></v-text-field>
                   </v-col>
                   <v-col
                     cols="12"
                     sm="6"
-                    md="4"
+                    md="3"
                   >
                     <v-text-field
                       v-model="editedItem.price"
-                      label="Prices"
+                      label="Price" 
+                      suffix="$"
+                      type="number"
                     ></v-text-field>
                   </v-col>
                   <v-col
                     cols="12"
                     sm="6"
-                    md="4"
+                    md="5"
                   >
                   <v-btn 
                   color="info" 
-                  @click="onPickFile">upload image</v-btn>
+                  @click="onPickFile">
+                    <v-icon>mdi-camera</v-icon>
+                    upload image
+                  </v-btn>
                   <input
                    color="primary"
                    type="file" 
@@ -87,15 +102,15 @@
                   md="4"
                   >
                     <v-img  
-                    :src="editedItem.imageUrl"
+                    :src="(editedIndex>-1)?editedItem.image:editedItem.imageUrl"
                     max-height="125"
                     aspect-ration="1.7"
                     contain ></v-img>
                   </v-col>
                   <v-col
                     cols="12"
-                    sm="8"
-                    md="6"
+                    sm="12"
+                    md="8"
                   >
                     <v-textarea
                       outlined
@@ -114,7 +129,7 @@
                     color="success"
                   ></v-checkbox>
                   </v-col>
-                  <v-col
+                  <!-- <v-col
                     cols="12"
                     sm="6"
                     md="4"
@@ -129,8 +144,8 @@
                     >
                       <template v-slot:activator="{ on, attrs }">
                         <v-text-field
-                          v-model="editedItem.date"
-                          label="Date created"
+                          v-model="editedItem.date_updated"
+                          label="Date updated"
                           prepend-icon="mdi-calendar"
                           readonly
                           v-bind="attrs"
@@ -146,7 +161,7 @@
                       ></v-date-picker>
                     </v-menu>
                   </template>
-                  </v-col>
+                  </v-col> -->
                 </v-row>
               </v-container>
             </v-card-text>
@@ -158,6 +173,7 @@
                 text
                 @click="close"
               >
+                <v-icon color="red">mdi-close-outline</v-icon>
                 Cancel
               </v-btn>
               <v-btn
@@ -165,6 +181,7 @@
                 text
                 @click="save"
               >
+                <v-icon color="success">mdi-check-outline</v-icon>
                 Save
               </v-btn>
             </v-card-actions>
@@ -175,8 +192,14 @@
             <v-card-title class="headline">Are you sure you want to delete this item?</v-card-title>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-              <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+              <v-btn color="red" text @click="closeDelete">
+                <v-icon color="red">mdi-close-outline</v-icon>
+                Cancel
+              </v-btn>
+              <v-btn color="success" text @click="deleteItemConfirm">
+                <v-icon color="success">mdi-check-outline</v-icon>
+                OK
+              </v-btn>
               <v-spacer></v-spacer>
             </v-card-actions>
           </v-card>
@@ -202,52 +225,58 @@
 
 <script>
 // import {db} from "../main.js"
+
+import { mapGetters } from 'vuex'
+
 // import firebase from "firebase"
   export default {
     data: () => ({
       date: null,
       menu: false,
       dialog: false,
+      search: '',
       dialogDelete: false,
       headers: [
         {
           text: 'Label',
           align: 'start',
-          sortable: false,
           value: 'label',
         },
-        { text: 'Price(FCFA)', value: 'price' },
-        { text: 'Description', value: 'description' },
-        { text: 'Available', value: 'available' },
-        { text: 'Date', value: 'date' },
+        { text: 'Price($)', value: 'price' },
+        { text: 'Available', value: 'available', sortable: false, align: 'center' },
+        { text: 'Date Updated', value: 'date_updated', align: 'center' },
+        { text: 'Date Created', value: 'date_created', align: 'center' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
-      products: [],
       editedIndex: -1,
       editedItem: {
         label: '',
-        price: '',
-        imageUrl: [],
+        price: 0,
+        imageUrl: null,
         image: null,
         description: '',
-        available: '',
+        available: false,
         date: ''
       },
       defaultItem: {
         label: '',
-        price: '',
+        price: 0,
         image: null,
-        imageUrl: [],
+        imageUrl: null,
         description: '',
-        available: '',
+        available: false,
         date: ''
       },
     }),
 
     computed: {
       formTitle () {
-        return this.editedIndex === -1 ? 'New Product' : 'Edit Product'
+        return this.editedIndex === -1 ? 'New Car' : 'Edit Car'
       },
+      ...mapGetters([
+        'myproducts',
+        'user'
+      ])
     },
 
     watch: {
@@ -262,27 +291,8 @@
       },
     },
 
-    created () {
-      // db.collection('products').where("userId","==",this.$store.getters.user).onSnapshot((snapshotChange) => {
-      //           this.products = [];
-      //           snapshotChange.forEach((doc) => {
-      //               this.products.push({
-      //                   key: doc.id,
-      //                   available: doc.data().available,
-      //                   date: doc.data().date,
-      //                   imageUrl: doc.data().imageUrl,
-      //                   description: doc.data().description,
-      //                   label: doc.data().label,
-      //                   price: doc.data().price,
-      //                   userId: doc.data().userId
-      //               });
-      //               console.log(doc.id,"=>",doc.data())
-      //           });
-      //           return this.products
-      //       })
-      //       .catch((error)=>{
-      //         console.log(error.message)
-      //       })
+    async created () {
+      await this.$store.dispatch("myProductsAction")
     },
     methods:{
       onPickFile(){
@@ -299,24 +309,26 @@
           this.editedItem.imageUrl =fileReader.result
         })
         fileReader.readAsDataURL(files[0])
-        this.editedItem.image=files[0]
+        // this.editedItem.image=files[0]
+        this.editedItem.image=this.editedItem.imageUrl
+        this.editedItem.image_changed=true
       },
       editItem (item) {
-        this.editedIndex = this.products.indexOf(item)
-        this.editedkey = this.products[this.editedIndex].key
+        this.editedIndex = this.myproducts.indexOf(item)
+        this.editedkey = this.myproducts[this.editedIndex].key
         this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
 
       deleteItem (item) {
-        this.editedIndex = this.products.indexOf(item)
-        this.editedkey=this.products[this.editedIndex].key
+        this.editedIndex = this.myproducts.indexOf(item)
+        this.editedkey=this.myproducts[this.editedIndex].key
         this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
       },
 
       deleteItemConfirm () {
-        this.products.splice(this.editedIndex, 1)
+        this.myproducts.splice(this.editedIndex, 1)
         this.closeDelete()
         // db.collection("products")
         // .doc(this.editedkey)
@@ -347,9 +359,12 @@
         })
       },
 
-      save () {
+      async save () {
         if (this.editedIndex > -1) {
-          Object.assign(this.products[this.editedIndex], this.editedItem)
+          this.editedItem.created_by=this.user.id
+          const response=await this.$store.dispatch("updateProducts",this.editedItem)
+          Object.assign(this.myproducts[this.editedIndex], this.editedItem)
+          console.log("car edited ",response.data)
           // let imageUrl
           // let key=this.editedkey
           //update product
@@ -375,6 +390,9 @@
           //   console.error("Error updating product: ", error);
           // });
         } else {
+          this.editedItem.created_by=this.user.id
+          const response=await this.$store.dispatch("createProducts",this.editedItem)
+          console.log("car created ",response.data)
           //createProduct
           // let key
           // let imageUrl
@@ -401,7 +419,7 @@
           // .catch((error) => {
           //   console.error("Error writing collection: ", error);
           // })
-          this.products.push(this.editedItem)
+          this.myproducts.push(this.editedItem)
         }
         this.close()
       },
@@ -429,6 +447,6 @@
 
       //   // create a product action
       // }
-      }
+    }
     }
 </script>

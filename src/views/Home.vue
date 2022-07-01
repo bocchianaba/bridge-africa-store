@@ -24,20 +24,7 @@
       md="12">
         <h2 style="text-align:center;color: blue">{{title}}</h2>
       </v-col>
-    </v-row> 
-    <v-row
-      v-if="products.length">
-      <v-col>
-          <div class="text-center">
-              <v-pagination
-              :value="page"
-              @input="update_page"
-              :length="Math.ceil(products.length/perPage)"
-              circle
-              ></v-pagination>
-          </div>
-      </v-col>
-    </v-row>    
+    </v-row>  
     <v-row justify="center">
       <v-col 
         cols="12"
@@ -63,7 +50,7 @@
           <v-card-actions>
             <v-btn
               color="orange lighten-2"
-              text
+              link
               :to="item.link"
             >
               Pourchase
@@ -150,6 +137,20 @@
         </v-card>
       </v-col> 
      </v-row> 
+    <v-row
+      v-if="products.length">
+      <v-col>
+          <div class="text-center">
+              <v-pagination
+              :value="page"
+              @input="update_page"
+              :length="Math.ceil(products.length/perPage)"
+              circle
+              color="green darken-3"
+              ></v-pagination>
+          </div>
+      </v-col>
+    </v-row>   
   </v-container>
 </template>
 <script>

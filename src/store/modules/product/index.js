@@ -45,7 +45,7 @@ const mutations={
         console.log("payload ",payload)
         state.products=payload
     },
-    SET_MYPRODUCTS(state, payload){
+    SET_MY_PRODUCTS(state, payload){
         state.myproducts=payload
     },
     SET_PRODUCT(state, payload){
@@ -80,7 +80,48 @@ const actions={
             commit('SET_STATUS','failure')   
             commit('SET_ERROR',error)        
         }
-    }
+    },
+    async myProductsAction({commit}){
+        try {
+            commit('SET_EVENT','my_product')
+            commit('SET_STATUS','loading')
+            const response= await axios.get(`${baseURL}/api/v1/myproducts`)
+            const products = response.data
+            console.log("myproducts ",products)
+            commit('SET_MY_PRODUCTS',products)
+            commit('SET_STATUS','success')
+        } catch (error) {
+            console.error(error)    
+            commit('SET_STATUS','failure')   
+            commit('SET_ERROR',error)        
+        }
+    },async updateProducts({commit},payload){
+        try {
+            commit('SET_EVENT','update_product')
+            commit('SET_STATUS','loading')
+            const response= await axios.put(`${baseURL}/api/v1/myproducts/`+payload.id, payload)
+            const products = response.data
+            console.log("products ",products)
+            commit('SET_STATUS','success')
+        } catch (error) {
+            console.error(error)    
+            commit('SET_STATUS','failure')   
+            commit('SET_ERROR',error)        
+        }
+    },async createProducts({commit},payload){
+        try {
+            commit('SET_EVENT','create_product')
+            commit('SET_STATUS','loading')
+            const response= await axios.post(`${baseURL}/api/v1/myproducts`,payload)
+            const products = response.data
+            console.log("products ",products)
+            commit('SET_STATUS','success')
+        } catch (error) {
+            console.error(error)    
+            commit('SET_STATUS','failure')   
+            commit('SET_ERROR',error)        
+        }
+    },
 }
 
 const productModule={

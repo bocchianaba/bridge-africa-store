@@ -9,7 +9,8 @@ from .views.product import (
     ProductPostDisLikePushView,
     ProductPostDislikePopView, 
     ProductPostLovePushView, 
-    ProductPostLovePopView
+    ProductPostLovePopView,
+    MyProductDetailView
 )
 
 
@@ -28,4 +29,6 @@ urlpatterns = [
     path('product/<int:pk>/dislike/pop', ProductPostDislikePopView.as_view(), name='product_dislike_pop'),
     path('product/<int:pk>/love', ProductPostLovePushView.as_view(), name='product_love_push'),
     path('product/<int:pk>/love/pop', ProductPostLovePopView.as_view(), name='product_love_pop'),
+    path('myproducts', MyProductDetailView.as_view(), name='my_products'),
+    path('myproducts/<int:pk>', MyProductDetailView.as_view(), name='update_my_product'),
 ]
