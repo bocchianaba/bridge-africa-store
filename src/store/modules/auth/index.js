@@ -35,6 +35,8 @@ const  actions= {
           commit('setUser', data.data)
         }
       } catch (error) {
+        window.localStorage.removeItem('token_access_api_bas')
+        axios.defaults.headers.common['Authorization']= ''
         console.log("error ",error)
         commit('setStatus', 'failure')
         commit('setError',error.message)

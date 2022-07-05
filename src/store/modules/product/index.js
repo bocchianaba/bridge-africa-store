@@ -99,10 +99,28 @@ const actions={
         try {
             commit('SET_EVENT','update_product')
             commit('SET_STATUS','loading')
-            const response= await axios.put(`${baseURL}/api/v1/myproducts/`+payload.id, payload)
-            const products = response.data
+            let data=payload
+            let products
+            if(typeof(data.image)!==File || data.image.name.indexOf("http://") != -1){
+                delete data["image"]
+                const response= await axios.put(`${baseURL}/api/v1/myproducts/${data.id}`,data)
+                products = await response.data
+            }
+            else{
+                const config={
+                    headers:{"content-type": "multipart/form-data"}
+                }
+                let formData = new FormData()
+                for(let d in data){
+                    formData.append(d, data[d])
+                }
+                console.log("form data ",formData)
+                const response= await axios.put(`${baseURL}/api/v1/myproducts/${payload.id}`,formData,config)
+                products = await response.data
+            }
             console.log("products ",products)
             commit('SET_STATUS','success')
+            return products
         } catch (error) {
             console.error(error)    
             commit('SET_STATUS','failure')   
@@ -112,16 +130,41 @@ const actions={
         try {
             commit('SET_EVENT','create_product')
             commit('SET_STATUS','loading')
-            const response= await axios.post(`${baseURL}/api/v1/myproducts`,payload)
-            const products = response.data
+            let data=payload
+            console.log("data image ",data.image)
+            if(data.image.name.indexOf("http://") != -1){
+                delete data["image"]
+            }
+            const config={
+                headers:{"content-type": "multipart/form-data"}
+            }
+            let formData = new FormData()
+            for(let d in data){
+                formData.append(d, data[d])
+            }
+            const response= await axios.post(`${baseURL}/api/v1/myproducts`,formData,config)
+            const products = await response.data
             console.log("products ",products)
+            commit('SET_STATUS','success')
+            return products
+        } catch (error) {
+            console.error(error)    
+            commit('SET_STATUS','failure')   
+            commit('SET_ERROR',error)        
+        }
+    },async deleteProducts({commit},id){
+        try {
+            commit('SET_EVENT','delete_product')
+            commit('SET_STATUS','loading')
+            await axios.delete(`${baseURL}/api/v1/myproducts/${id}`)
+            console.log("deleted ")
             commit('SET_STATUS','success')
         } catch (error) {
             console.error(error)    
             commit('SET_STATUS','failure')   
             commit('SET_ERROR',error)        
         }
-    },
+    }
 }
 
 const productModule={

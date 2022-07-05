@@ -62,8 +62,7 @@
                       v-model="editedItem.label"
                       label="Label"
                       :rules="[value => !!value || 'Required.',v => (v && v.length <= 10) || 'Name must be less than 10 characters']"
-                      hide-details="auto"
-                    ></v-text-field>
+                      ></v-text-field>
                   </v-col>
                   <v-col
                     cols="12"
@@ -73,6 +72,7 @@
                     <v-text-field
                       v-model="editedItem.price"
                       label="Price" 
+                      :rules="[value => !!value || 'Required.']"
                       suffix="$"
                       type="number"
                     ></v-text-field>
@@ -102,7 +102,7 @@
                   md="4"
                   >
                     <v-img  
-                    :src="(editedIndex>-1)?editedItem.image:editedItem.imageUrl"
+                    :src="(!preview)? editedItem.image: preview "
                     max-height="125"
                     aspect-ration="1.7"
                     contain ></v-img>
@@ -129,40 +129,7 @@
                     color="success"
                   ></v-checkbox>
                   </v-col>
-                  <!-- <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  ><template>
-                    <v-menu
-                      ref="menu"
-                      v-model="menu"
-                      :close-on-content-click="false"
-                      transition="scale-transition"
-                      offset-y
-                      min-width="auto"
-                    >
-                      <template v-slot:activator="{ on, attrs }">
-                        <v-text-field
-                          v-model="editedItem.date_updated"
-                          label="Date updated"
-                          prepend-icon="mdi-calendar"
-                          readonly
-                          v-bind="attrs"
-                          v-on="on"
-                        ></v-text-field>
-                      </template>
-                      <v-date-picker
-                        ref="picker"
-                        v-model="editedItem.date"
-                        :max="new Date().toISOString().substr(0, 10)"
-                        min="1950-01-01"
-                        @change="saveDate"
-                      ></v-date-picker>
-                    </v-menu>
-                  </template>
-                  </v-col> -->
-                </v-row>
+                  </v-row>
               </v-container>
             </v-card-text>
 
@@ -253,7 +220,7 @@ import { mapGetters } from 'vuex'
         label: '',
         price: 0,
         imageUrl: null,
-        image: null,
+        image: 'defaults.png',
         description: '',
         available: false,
         date: ''
@@ -262,11 +229,12 @@ import { mapGetters } from 'vuex'
         label: '',
         price: 0,
         image: null,
-        imageUrl: null,
+        imageUrl: 'defaults.png',
         description: '',
         available: false,
         date: ''
       },
+      preview:''
     }),
 
     computed: {
@@ -299,19 +267,18 @@ import { mapGetters } from 'vuex'
         this.$refs.fileInput.click()
       },
       onFilePicked(event){
-        const files=event.target.files
-        let filename = files[0].name
-        if(filename.lastIndexOf('.') <=0){
-          return alert('Please add a valid file')
+        const files=event.target.files||event.dataTransfer.files
+        if(!files.length) return
+        this.editedItem.image=files[0]
+        this.createImage(files[0])
+      },
+      createImage(file){
+        let reader = new FileReader()
+        let vm = this
+        reader.onload = e =>{
+          vm.preview = e.target.result
         }
-        const fileReader= new FileReader()
-        fileReader.addEventListener('load', ()=>{
-          this.editedItem.imageUrl =fileReader.result
-        })
-        fileReader.readAsDataURL(files[0])
-        // this.editedItem.image=files[0]
-        this.editedItem.image=this.editedItem.imageUrl
-        this.editedItem.image_changed=true
+        reader.readAsDataURL(file)
       },
       editItem (item) {
         this.editedIndex = this.myproducts.indexOf(item)
@@ -327,44 +294,33 @@ import { mapGetters } from 'vuex'
         this.dialogDelete = true
       },
 
-      deleteItemConfirm () {
+      async deleteItemConfirm () {
+        console.log("id to delete ",this.myproducts[this.editedIndex].id)
+          // const products=await this.$store.dispatch("updateProducts",this.editedItem)
+        await this.$store.dispatch("deleteProducts",this.myproducts[this.editedIndex].id)
         this.myproducts.splice(this.editedIndex, 1)
         this.closeDelete()
-        // db.collection("products")
-        // .doc(this.editedkey)
-        // .delete()
-        // .then(() => {
-        //   console.log("Document successfully deleted!");
-        // })
-        // .catch((error) => {
-        //   console.error("Error removing document: ", error);
-        // });
-
-        //action to delete item from backend
       },
 
       close () {
         this.dialog = false
-        this.$nextTick(() => {
-          this.editedItem = Object.assign({}, this.defaultItem)
-          this.editedIndex = -1
-        })
+        this.editedItem = Object.assign({}, this.defaultItem)
+        this.editedIndex = -1
+        this.preview=""
       },
 
       closeDelete () {
         this.dialogDelete = false
-        this.$nextTick(() => {
-          this.editedItem = Object.assign({}, this.defaultItem)
-          this.editedIndex = -1
-        })
+        this.editedItem = Object.assign({}, this.defaultItem)
+        this.editedIndex = -1
       },
 
       async save () {
         if (this.editedIndex > -1) {
           this.editedItem.created_by=this.user.id
-          const response=await this.$store.dispatch("updateProducts",this.editedItem)
-          Object.assign(this.myproducts[this.editedIndex], this.editedItem)
-          console.log("car edited ",response.data)
+          const products=await this.$store.dispatch("updateProducts",this.editedItem)
+          Object.assign(this.myproducts[this.editedIndex], products)
+          console.log("car edited ")
           // let imageUrl
           // let key=this.editedkey
           //update product
@@ -391,8 +347,8 @@ import { mapGetters } from 'vuex'
           // });
         } else {
           this.editedItem.created_by=this.user.id
-          const response=await this.$store.dispatch("createProducts",this.editedItem)
-          console.log("car created ",response.data)
+          const products=await this.$store.dispatch("createProducts",this.editedItem)
+          console.log("car created ")
           //createProduct
           // let key
           // let imageUrl
@@ -419,7 +375,7 @@ import { mapGetters } from 'vuex'
           // .catch((error) => {
           //   console.error("Error writing collection: ", error);
           // })
-          this.myproducts.push(this.editedItem)
+          this.myproducts.push(products)
         }
         this.close()
       },

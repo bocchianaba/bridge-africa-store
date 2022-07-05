@@ -32,21 +32,23 @@ class MyProductDetailView(APIView):
         response = serializer.data
         return Response(response, status=status.HTTP_200_OK)
 
+    def delete(self, request, pk, *args, **kwargs):
+        product = self.get_object(pk)
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     def put(self, request, pk, format=None):
         product = self.get_object(pk)
-        if(not request.data['image_changed']):
-            request.data.pop('image')
         serializer = ProductSerializer(product, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            serializer2 = ProductSerializer(self.get_object(pk), context={"request": request})
+            return Response(serializer2.data)
         print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
     def post(self, request, format=None):
-        if(('image_changed' in request.data) and (not request.data['image_changed'])):
-            request.data.pop('image')
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data, context={"request": request})
         if serializer.is_valid():
             serializer.save()
             status_code = status.HTTP_201_CREATED
