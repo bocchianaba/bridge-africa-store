@@ -5,6 +5,7 @@ import Login from '../components/auth/Login.vue'
 import Register from '../components/auth/Register.vue'
 import Myproduct from '../components/Myproduct.vue'
 import NotFound from '../components/NotFound.vue'
+import Product from '../views/Product.vue'
 
 Vue.use(VueRouter)
 
@@ -41,6 +42,11 @@ const routes = [
     path: '/myproduct',
     name: 'Myproduct',
     component: Myproduct,
+  },
+  {
+    path: '/car/:id',
+    name: 'Product',
+    component: Product,
   },
   {
     path: '/home',

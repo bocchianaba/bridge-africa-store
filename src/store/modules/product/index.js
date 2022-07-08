@@ -10,7 +10,9 @@ const state={
     event:null,
     error:null,
     page: 1,
-    perPage: 6
+    perPage: 6,
+    cart: [],
+    cart_ids: []
 }
 
 const getters={
@@ -38,6 +40,8 @@ const getters={
     page(state){
         return state.page
     },
+    cart:()=>state.cart,
+    cart_ids:()=>state.cart_ids,
 }
 
 const mutations={
@@ -80,18 +84,41 @@ const mutations={
     },
     PUSH_LOVE(state, id){
         state.product.love.push(id)
+    },
+    PUSH_CART(state, payload){
+        state.cart.push(payload)
+        state.cart_ids.push(payload.id)
+    },
+    REMOVE_CART(state, id){
+        const index = state.cart.findIndex(p=>p.id==id)
+        state.cart.splice(index,1)
+        state.cart_ids.splice(index,1)
     }
 }
 
 const actions={
     async productsAction({commit}){
         try {
-            commit('SET_EVENT','product')
+            commit('SET_EVENT','products')
             commit('SET_STATUS','loading')
             const response= await axios.get(`${baseURL}/api/v1/products`)
             const products = response.data
             console.log("products ",products)
             commit('SET_PRODUCTS',products)
+            commit('SET_STATUS','success')
+        } catch (error) {
+            console.error(error)    
+            commit('SET_STATUS','failure')   
+            commit('SET_ERROR',error)        
+        }
+    },async productAction({dispatch, commit},id){
+        try {
+            commit('SET_EVENT','product')
+            commit('SET_STATUS','loading')
+            await dispatch('productsAction')
+            const product = state.products.find(p=> p.id==id)
+            console.log("product ",product)
+            commit('SET_PRODUCT',product)
             commit('SET_STATUS','success')
         } catch (error) {
             console.error(error)    
@@ -295,7 +322,13 @@ const actions={
                 console.log("error " + err.message)
             }
         }
-    },
+    },async addProductCart({commit},payload){
+        commit('PUSH_CART',payload)
+        // add request here
+    },async RemoveProductCart({commit},id){
+        commit('REMOVE_CART',id)
+        // add request here
+    }
 }
 
 const productModule={

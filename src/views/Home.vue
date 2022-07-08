@@ -61,9 +61,9 @@
 
           <v-card-actions>
             <v-btn
-              color="orange lighten-2"
-              link
-              :to="item.link"
+              outlined
+              color="orange darken-2"
+              @click="$router.push(item.link)"
             >
               Pourchase
             </v-btn>
