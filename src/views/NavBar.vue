@@ -83,10 +83,10 @@ export default {
         }
     },
     methods:{
-        logout(){
-            this.$store.dispatch('logoutAction')
-            this.$router.push('/login')
-        }
+      logout(){
+        this.$store.dispatch('logoutAction')
+        this.$router.push('/login')
+      }
     },
     created () {
       this.$store.dispatch('initAction')
