@@ -63,6 +63,24 @@ const mutations={
     SET_PAGE(state, payload){
         state.page = payload
     },
+    REMOVE_LIKE(state, index){
+        state.product.like.splice(index,1)
+    },
+    REMOVE_DISLIKE(state, index){
+        state.product.dislike.splice(index,1)
+    },
+    REMOVE_LOVE(state, index){
+        state.product.love.splice(index,1)
+    },
+    PUSH_LIKE(state, id){
+        state.product.like.push(id)
+    },
+    PUSH_DISLIKE(state, id){
+        state.product.dislike.push(id)
+    },
+    PUSH_LOVE(state, id){
+        state.product.love.push(id)
+    }
 }
 
 const actions={
@@ -80,8 +98,7 @@ const actions={
             commit('SET_STATUS','failure')   
             commit('SET_ERROR',error)        
         }
-    },
-    async myProductsAction({commit}){
+    },async myProductsAction({commit}){
         try {
             commit('SET_EVENT','my_product')
             commit('SET_STATUS','loading')
@@ -164,7 +181,121 @@ const actions={
             commit('SET_STATUS','failure')   
             commit('SET_ERROR',error)        
         }
-    }
+    },async likeAction({commit},{payload, id}){
+        commit("SET_PRODUCT", payload)
+        console.log("finish set product", state.product,id)
+        if(state.product.like.findIndex(user_id=> user_id==id)==-1){
+            var index = state.product.dislike.findIndex(user_id=> user_id==id)
+            if(index != -1){
+                try{
+                    commit("REMOVE_DISLIKE",index)
+                    const response= await axios.put(`${baseURL}/api/v1/product/dislike/pop/${state.product.id}`,state.product)
+                    console.log(response.data)
+                }catch(err){
+                    commit('SET_ERROR', err.message)
+                    console.log("error " + err.message)
+                }
+            }
+            index = state.product.love.findIndex(user_id=> user_id==id)
+            if(index!=-1){
+                // request must be here
+                try{
+                    commit("REMOVE_LOVE",index)
+                    const response= await axios.put(`${baseURL}/api/v1/product/love/pop/${state.product.id}`,state.product)
+                    console.log(response.data)
+                }catch(err){
+                    commit('SET_ERROR', err.message)
+                    console.log("error " + err.message)
+                }
+            }
+            // request must be here
+            try{
+                commit("PUSH_LIKE",id)
+                console.log("produit apprécié ",state.product)
+                const response= await axios.put(`${baseURL}/api/v1/product/like/push/${state.product.id}`,state.product)
+                console.log(response.data)
+            }catch(err){
+                commit('SET_ERROR', err.message)
+                console.log("error " + err.message)
+            }
+        }
+    },async dislikeAction({commit},{payload, id}){
+        commit("SET_PRODUCT", payload)
+        console.log("finish set product", state.product,id)
+        if(state.product.dislike.findIndex(user_id=> user_id==id)==-1){
+            var index = state.product.like.findIndex(user_id=> user_id==id)
+            if(index != -1){
+                try{
+                    commit("REMOVE_LIKE",index)
+                    const response= await axios.put(`${baseURL}/api/v1/product/like/pop/${state.product.id}`,state.product)
+                    console.log(response.data)
+                }catch(err){
+                    commit('SET_ERROR', err.message)
+                    console.log("error " + err.message)
+                }
+            }
+            index = state.product.love.findIndex(user_id=> user_id==id)
+            if(index!=-1){
+                // request must be here
+                try{
+                    commit("REMOVE_LOVE",index)
+                    const response= await axios.put(`${baseURL}/api/v1/product/love/pop/${state.product.id}`,state.product)
+                    console.log(response.data)
+                }catch(err){
+                    commit('SET_ERROR', err.message)
+                    console.log("error " + err.message)
+                }
+            }
+            // request must be here
+            try{
+                commit("PUSH_DISLIKE",id)
+                console.log("produit apprécié ",state.product)
+                const response= await axios.put(`${baseURL}/api/v1/product/dislike/push/${state.product.id}`,state.product)
+                console.log(response.data)
+            }catch(err){
+                commit('SET_ERROR', err.message)
+                console.log("error " + err.message)
+            }
+        }
+    },async loveAction({commit},{payload, id}){
+        commit("SET_PRODUCT", payload)
+        console.log("finish set product", state.product,id)
+        if(state.product.love.findIndex(user_id=> user_id==id)==-1){
+            var index = state.product.dislike.findIndex(user_id=> user_id==id)
+            if(index != -1){
+                try{
+                    commit("REMOVE_DISLIKE",index)
+                    const response= await axios.put(`${baseURL}/api/v1/product/dislike/pop/${state.product.id}`,state.product)
+                    console.log(response.data)
+                }catch(err){
+                    commit('SET_ERROR', err.message)
+                    console.log("error " + err.message)
+                }
+            }
+            index = state.product.like.findIndex(user_id=> user_id==id)
+            if(index!=-1){
+                // request must be here
+                try{
+                    commit("REMOVE_LIKE",index)
+                    const response= await axios.put(`${baseURL}/api/v1/product/like/pop/${state.product.id}`,state.product)
+                    console.log(response.data)
+                }catch(err){
+                    commit('SET_ERROR', err.message)
+                    console.log("error " + err.message)
+                }
+            }
+            // request must be here
+            try{
+                commit("PUSH_LOVE",id)
+                console.log("produit adoré ",state.product)
+                const response= await axios.put(`${baseURL}/api/v1/product/love/push/${state.product.id}`,state.product)
+                console.log(response.data)
+            }catch(err){
+                commit('SET_ERROR', err.message)
+                console.log("error " + err.message)
+            }
+        }
+    },
 }
 
 const productModule={

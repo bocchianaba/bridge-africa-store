@@ -33,11 +33,23 @@
         xs="8"
         v-for="item in visibleProducts" :key="item.id">
         <v-card>
-          <v-img
-            :src="item.image"
-            height="200px"
-            contain
-          ></v-img>
+            <v-img
+              :src="item.image"
+              height="250px"
+              width="400px"
+              contain
+            >
+              <template v-slot:placeholder>
+                <v-sheet>
+                  <v-skeleton-loader
+                    class="mx-auto my-4"
+                    width="300px"
+                    height="150px"
+                    type="image">
+                  </v-skeleton-loader>
+                </v-sheet>
+              </template>          
+            </v-img>
 
           <v-card-title>
             {{item.label}}
@@ -57,83 +69,73 @@
             </v-btn>
 
             <v-spacer></v-spacer>
-            <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
             <v-badge
+              bordered
+              overlap
               color="primary"
               :content="item.like.length"
-              v-bind="attrs"
-              v-on="on"
-            >                               
+            >   
+            <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">                            
               <v-btn
                 color="primary"
                 icon
-                :to="item.link"
+                @click="like({payload: item, id: $store.getters.user.id})"
+                v-bind="attrs"
+                v-on="on"
               >
                 <v-icon>{{(item.like.findIndex(l=>user.id==l)!=-1)?'mdi-thumb-up':'mdi-thumb-up-outline'}}</v-icon>
               </v-btn>
-            </v-badge>
             </template>
-            <span>Aimer</span>
+            <span>{{(item.like.findIndex(l=>user.id==l)!=-1)?'You liked this car !':'Like ?'}}</span>
             </v-tooltip>
+            </v-badge>
 
-            <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
             <v-badge
+              bordered
+              overlap
               color="primary"
               :content="item.dislike.length"
-              v-bind="attrs"
-              v-on="on"
-            > 
-            <v-btn
-              color="primary"
-              icon
-            >
-              <v-icon>{{(item.dislike.findIndex(l=>user.id==l)!=-1)?'mdi-thumb-down':'mdi-thumb-down-outline'}}</v-icon>
-            </v-btn>
-            </v-badge>
-            </template>
-            <span>Ne pas aimer</span>
-            </v-tooltip>
-
+            >   
             <v-tooltip bottom>
-            <template v-slot:activator="{ on, attrs }">
+            <template v-slot:activator="{ on, attrs }">                            
+              <v-btn
+                color="primary"
+                icon
+                @click="dislike({payload: item, id: $store.getters.user.id})"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon>{{(item.dislike.findIndex(l=>user.id==l)!=-1)?'mdi-thumb-down':'mdi-thumb-down-outline'}}</v-icon>
+              </v-btn>
+            </template>
+            <span>{{(item.dislike.findIndex(l=>user.id==l)!=-1)?'You disliked this car !':'Dislike ?'}}</span>
+            </v-tooltip>
+            </v-badge>
+
             <v-badge
+              bordered
+              overlap
               color="primary"
               :content="item.love.length"
-              v-bind="attrs"
-              v-on="on"
-            > 
-            <v-btn
-              color="primary"
-              icon
-            >
-              <v-icon>{{(item.love.findIndex(l=>user.id==l)!=-1)?'mdi-heart':'mdi-heart-outline'}}</v-icon>
-            </v-btn>
-            </v-badge>
+            >   
+            <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">                            
+              <v-btn
+                color="primary"
+                icon
+                @click="love({payload: item, id: $store.getters.user.id})"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon>{{(item.love.findIndex(l=>user.id==l)!=-1)?'mdi-heart':'mdi-heart-outline'}}</v-icon>
+              </v-btn>
             </template>
-            <span>Adorer</span>
+            <span>{{(item.love.findIndex(l=>user.id==l)!=-1)?'You loved this car !':'Love ?'}}</span>
             </v-tooltip>
-
+            </v-badge>
             <v-spacer></v-spacer>
-
-            <v-btn
-              icon
-              @click="item.show = !item.show"
-            >
-              <v-icon>{{ item.show ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
-            </v-btn>
           </v-card-actions>
-
-          <v-expand-transition>
-            <div v-show="item.show">
-              <v-divider></v-divider>
-
-              <v-card-text>
-                {{item.description}}
-              </v-card-text>
-            </div>
-          </v-expand-transition>
         </v-card>
       </v-col> 
      </v-row> 
@@ -155,7 +157,7 @@
 </template>
 <script>
 
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 
   export default {
@@ -179,6 +181,11 @@ import { mapGetters } from 'vuex'
       update_page(number) {
         this.$store.commit("SET_PAGE", number);
       },
+      ...mapActions({
+        dislike: 'dislikeAction',
+        love: 'loveAction',
+        like: 'likeAction'
+      })
     }
   }
 </script>

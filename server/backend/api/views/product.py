@@ -42,6 +42,7 @@ class MyProductDetailView(APIView):
         serializer = ProductSerializer(product, data=request.data)
         if serializer.is_valid():
             serializer.save()
+            #we must return the url of the image of the product
             serializer2 = ProductSerializer(self.get_object(pk), context={"request": request})
             return Response(serializer2.data)
         print(serializer.errors)
@@ -68,6 +69,7 @@ class ProductPostLikePushView(APIView):
     def put(self, request, pk, format=None):
         product = self.get_object(pk)
         like=request.data.pop('image')
+        print(request.data)
         serializer = ProductSerializer(product, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -174,28 +176,3 @@ class ProductPostLovePopView(APIView):
             return Response(serializer.data)
         print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-# class ProductNestedView(APIView):
-#     serializer_class = ProductSerializer
-#     permission_classes = (AllowAny, )
-#     def depth(self, obj, request):
-#         pk=obj['id']
-#         product = Product.objects.filter(parent_product=pk)
-#         serializer = ProductSerializer(product, context={"request": request}, many=True)
-#         respons = serializer.data
-#         obj['children']=respons
-#         if len(respons):
-#             for children in obj['children']:
-#                 self.depth(children, request)
-            
-#         return obj
-#     def get(self, request, *args, **kwargs):
-#         responses=[]
-#         product = Product.objects.filter(is_sector=True)
-#         serializer = ProductSerializer(product, context={"request": request}, many=True)
-#         response = serializer.data
-#         if(len(response)):
-#             for resp in response:
-#                 responses.append(self.depth(resp, request))
-
-#         return Response(responses, status=status.HTTP_200_OK)
-
