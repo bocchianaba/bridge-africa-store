@@ -22,7 +22,7 @@
 <!-- navigation bar links -->
       <v-toolbar-items  v-if="!userLogedIn">
         <v-btn color="green darken-3"  v-for="item in itemsNotlogin" :key="item.title" :to="item.link">
-          <v-icon left>{{item.icon}}</v-icon><span>{{item.title}}</span>
+          <v-icon left>{{item.icon}}</v-icon><span class="hidden-sm-and-down">{{item.title}}</span>
         </v-btn>
         <v-spacer></v-spacer>
       </v-toolbar-items>
