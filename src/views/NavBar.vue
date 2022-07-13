@@ -32,7 +32,7 @@
         </v-btn>
         <v-spacer></v-spacer>
       </v-toolbar-items>
-      <v-toolbar-items class="hidden-md-and-down">        
+      <!-- <v-toolbar-items class="hidden-md-and-down">        
         <v-menu offset-y>
           <template v-slot:activator="{ on, attrs }">
             <v-btn 
@@ -55,7 +55,7 @@
             </v-list-item>
           </v-list>
         </v-menu>
-      </v-toolbar-items>
+      </v-toolbar-items> -->
       <!-- sign out button -->
       <v-toolbar-items class="hidden-md-and-down"  @click='logout' v-if="userLogedIn" >
         <v-btn  color="green darken-3">
