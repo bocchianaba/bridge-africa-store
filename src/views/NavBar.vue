@@ -20,13 +20,13 @@
       </div>
       <v-spacer></v-spacer>
 <!-- navigation bar links -->
-      <v-toolbar-items class="hidden-md-and-down"  v-if="!userLogedIn">
+      <v-toolbar-items  v-if="!userLogedIn">
         <v-btn color="green darken-3"  v-for="item in itemsNotlogin" :key="item.title" :to="item.link">
           <v-icon left>{{item.icon}}</v-icon><span>{{item.title}}</span>
         </v-btn>
         <v-spacer></v-spacer>
       </v-toolbar-items>
-      <v-toolbar-items class="hidden-md-and-down"  v-else>
+      <v-toolbar-items  v-else>
         <v-btn color="green darken-3"  v-for="item in itemslogin" :key="item.title" :to="item.link">
           <v-icon left>{{item.icon}}</v-icon><span class="hidden-sm-and-down">{{item.title}}</span>
         </v-btn>
@@ -57,7 +57,7 @@
         </v-menu>
       </v-toolbar-items> -->
       <!-- sign out button -->
-      <v-toolbar-items class="hidden-md-and-down"  @click='logout' v-if="userLogedIn" >
+      <v-toolbar-items  @click='logout' v-if="userLogedIn" >
         <v-btn  color="green darken-3">
           <v-icon left>mdi-logout</v-icon><span class="hidden-sm-and-down">Logout</span>
         </v-btn>
