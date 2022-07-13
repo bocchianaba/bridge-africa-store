@@ -189,8 +189,11 @@ const actions={
             const response= await axios.post(`${baseURL}/api/v1/myproducts`,formData,config)
             const products = await response.data
             console.log("products ",products)
+            const response_data= await axios.get(`${baseURL}/api/v1/myproducts/${products.id}`)
+            const product = await response_data.data
+            console.log("product ",product)
             commit('SET_STATUS','success')
-            return products
+            return product
         } catch (error) {
             console.error(error)    
             commit('SET_STATUS','failure')   
